@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insta-Lite</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo">Insta-Lite</a>
+            <div>
+                <button onclick="toggleModal('postModal', true)" class="btn-primary"
+                    style="width: auto; padding: 5px 15px;">글쓰기</button>
+                <button onclick="handleLogout()"
+                    style="background:none; border:none; cursor:pointer; margin-left:10px;">로그아웃</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="feed">
+        <!-- 게시물이 여기에 렌더링됩니다 -->
+    </main>
+
+    <!-- 글쓰기 모달 -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <h2>새 게시물 만들기</h2>
+            <form onsubmit="handleCreatePost(event)" style="margin-top:15px;">
+                <input type="file" name="file" accept="image/*" required style="margin-bottom:10px;">
+                <textarea name="content" placeholder="문구 입력..."
+                    style="width:100%; height:100px; padding:10px; margin-bottom:10px; border:1px solid #dbdbdb; border-radius:4px;"></textarea>
+                <div style="display:flex; gap:10px;">
+                    <button type="submit" class="btn-primary">공유하기</button>
+                    <button type="button" onclick="toggleModal('postModal', false)"
+                        style="width:100%; border:1px solid #dbdbdb; background:white; cursor:pointer;">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('token')) {
+                window.location.href = '/login';
+            } else {
+                loadPosts();
+            }
+        });
+    </script>
+</body>
+
+</html>

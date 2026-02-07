@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상세보기 - Insta-Lite</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo">Insta-Lite</a>
+        </div>
+    </header>
+
+    <main id="post-detail">
+        <!-- 게시물 상세 내용이 여기에 렌더링됩니다 -->
+    </main>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        const postId = {{ post_id }};
+
+        async function loadPostDetail() {
+            const res = await api.get(`/api/posts/${postId}`);
+            if (!res.ok) return;
+            const post = await res.json();
+
+            const commentRes = await api.get(`/api/posts/${postId}/comments`);
+            const comments = commentRes.ok ? await commentRes.json() : [];
+
+            const detail = document.getElementById('post-detail');
+            detail.innerHTML = `
+                <article class="post-card">
+                    <header class="post-header">User ${post.user_id}</header>
+                    <img src="${post.img_path}" class="post-image" alt="Post">
+                    <div class="post-actions">
+                        <button onclick="toggleLike(${post.id})">❤️</button>
+                    </div>
+                    <div class="post-content">
+                        <span class="username">User ${post.user_id}</span>
+                        ${post.content || ''}
+                    </div>
+                    <div class="comments-section">
+                        <div id="comment-list">
+                            ${comments.map(c => `<div class="comment-item"><strong>User ${c.user_id}</strong> ${c.comment}</div>`).join('')}
+                        </div>
+                        <form onsubmit="handleAddComment(event)" style="margin-top:10px; display:flex;">
+                            <input type="text" id="comment-input" placeholder="댓글 달기..." style="flex:1; border:none; outline:none;">
+                            <button type="submit" style="background:none; border:none; color:#0095f6; font-weight:bold; cursor:pointer;">게시</button>
+                        </form>
+                    </div>
+                </article>
+            `;
+        }
+
+        async function handleAddComment(e) {
+            e.preventDefault();
+            const comment = document.getElementById('comment-input').value;
+            const res = await api.post(`/api/posts/${postId}/comments`, { comment });
+            if (res.ok) {
+                loadPostDetail();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPostDetail);
+    </script>
+</body>
+
+</html>

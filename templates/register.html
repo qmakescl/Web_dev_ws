@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 - Insta-Lite</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <h1 class="logo">Insta-Lite</h1>
+        <form class="auth-form" onsubmit="handleRegister(event)">
+            <input type="email" id="email" placeholder="이메일" required>
+            <input type="password" id="password" placeholder="비밀번호" required>
+            <button type="submit" class="btn-primary">가입하기</button>
+        </form>
+        <div style="margin-top: 20px;">
+            계정이 있으신가요? <a href="/login">로그인</a>
+        </div>
+    </div>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

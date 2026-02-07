@@ -8,3 +8,14 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Database
+data/
+*.db
+
+# Static uploads
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Test logs
+*.json
