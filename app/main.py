@@ -2,9 +2,9 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from .database import init_db
-from .routers import auth, posts, likes, comments
+from .routers import auth, posts, likes, comments, tags
 
-app = FastAPI(title="Insta-Lite API")
+app = FastAPI(title="MyStaGram API")
 
 # 데이터베이스 초기화
 init_db()
@@ -19,6 +19,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(posts.router, prefix="/api/posts", tags=["posts"])
 app.include_router(likes.router, prefix="/api/posts", tags=["likes"])
 app.include_router(comments.router, prefix="/api/posts", tags=["comments"])
+app.include_router(tags.router, prefix="/api/tags", tags=["tags"])
 
 # HTML 페이지 라우트
 @app.get("/")

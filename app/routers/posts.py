@@ -9,6 +9,13 @@ import uuid
 import shutil
 from datetime import datetime
 
+import re
+
+def extract_tags(content: str) -> List[str]:
+    if not content:
+        return []
+    return re.findall(r"#(\w+)", content)
+
 router = APIRouter()
 
 @router.post("/", response_model=PostResponse)
@@ -40,6 +47,21 @@ async def create_post(
         
         cursor.execute("SELECT * FROM posts WHERE id = ?", (post_id,))
         new_post = cursor.fetchone()
+        
+        # 태그 처리
+        tags = extract_tags(content)
+        for tag_name in tags:
+            # 태그가 없으면 생성 (IGNORE)
+            cursor.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (tag_name,))
+            
+            # 태그 ID 가져오기
+            cursor.execute("SELECT id FROM tags WHERE name = ?", (tag_name,))
+            tag_id = cursor.fetchone()["id"]
+            
+            # 게시물-태그 연결
+            cursor.execute("INSERT OR IGNORE INTO post_tags (post_id, tag_id) VALUES (?, ?)", (post_id, tag_id))
+            
+        conn.commit()
         conn.close()
         return dict(new_post)
     except Exception as e:

@@ -73,7 +73,7 @@ def init_db():
         tag_id INTEGER NOT NULL,
         PRIMARY KEY (post_id, tag_id),
         FOREIGN KEY (post_id) REFERENCES posts (id),
-        FOREIGN KEY (post_id) REFERENCES tags (id)
+        FOREIGN KEY (tag_id) REFERENCES tags (id)
     )
     ''')
     

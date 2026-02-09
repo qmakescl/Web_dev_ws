@@ -73,13 +73,19 @@ function handleLogout() {
 }
 
 // --- Post Functions ---
-async function loadPosts() {
-    const res = await api.get('/api/posts');
+async function loadPosts(tag = null) {
+    const url = tag ? `/api/tags/${tag}` : '/api/posts';
+    const res = await api.get(url);
     if (!res.ok) return;
 
     const posts = await res.json();
     const feed = document.getElementById('feed');
     if (!feed) return;
+
+    if (posts.length === 0) {
+        feed.innerHTML = '<div style="text-align:center; padding:20px;">게시물이 없습니다.</div>';
+        return;
+    }
 
     feed.innerHTML = posts.map(post => `
         <article class="post-card">
@@ -91,10 +97,24 @@ async function loadPosts() {
             </div>
             <div class="post-content">
                 <span class="username">User ${post.user_id}</span>
-                ${post.content || ''}
+                ${linkifyTags(post.content || '')}
             </div>
         </article>
     `).join('');
+}
+
+function linkifyTags(text) {
+    return text.replace(/#(\w+)/g, '<span class="hashtag" onclick="loadPosts(\'$1\')" style="color:#00376b; cursor:pointer;">#$1</span>');
+}
+
+async function handleSearch(e) {
+    e.preventDefault();
+    const query = document.getElementById('search-input').value.trim();
+    if (query) {
+        loadPosts(query);
+    } else {
+        loadPosts();
+    }
 }
 
 async function handleCreatePost(e) {
