@@ -81,7 +81,7 @@ async function request(url, options) {
 | **FastAPI** | 요청을 가장 먼저 받는 **현관문** | `app/main.py` | Python 기반의 고성능 웹 프레임워크 |
 | **Routers** | 요청을 종류별로 분류하는 **안내 데스크** | `app/routers/` | 기능별(로그인, 글쓰기 등)로 코드를 나눔 |
 | **Models** | 데이터의 **형식(규격)**을 정의 | `app/models.py` | 이메일은 문자열, 나이는 숫자 등 규칙 정의 |
-| **Database** | 데이터를 영구히 **저장하는 창고** | `data/insta.db` | 엑셀 시트처럼 회원정보, 글 등을 저장 |
+| **Database** | 데이터를 영구히 **저장하는 창고** | `data/insta.db` | 회원, 게시물, **태그(`Tags`, `PostTags`)** 등을 저장 |
 
 ### 3.2. 주요 동작 방식
 
@@ -115,7 +115,44 @@ async def read_posts():
 
 ---
 
-## 5. 마치며
+## 5. 심화: 태그 검색과 데이터베이스 관계 (N:M)
+
+이번에 추가된 **태그 검색 기능**은 데이터베이스의 꽃이라 불리는 **다대다(N:M) 관계**를 다룹니다.
+
+### 5.1. 왜 복잡한가요?
+*   하나의 게시물에는 **여러 개의 태그**가 달릴 수 있습니다 (#고양이, #귀여워).
+*   하나의 태그는 **여러 게시물**에 달릴 수 있습니다.
+
+이 관계를 표현하기 위해 `PostTags`라는 **연결 테이블(Cross Table)**을 사용했습니다.
+
+```mermaid
+erDiagram
+    Posts ||--o{ PostTags : "가진다"
+    Tags ||--o{ PostTags : "소속된다"
+    
+    Posts {
+        int id
+        string content
+    }
+    PostTags {
+        int post_id FK
+        int tag_id FK
+    }
+    Tags {
+        int id
+        string name
+    }
+```
+
+### 5.2. 검색의 원리
+사용자가 `#고양이`를 검색하면, 서버는 다음 순서로 데이터를 찾습니다:
+1.  `Tags` 테이블에서 "고양이" 태그의 `id`를 찾습니다.
+2.  `PostTags` 테이블에서 그 `tag_id`를 가진 모든 `post_id`를 찾습니다.
+3.  `Posts` 테이블에서 그 `post_id`들에 해당하는 실제 게시물 내용을 가져옵니다 (`JOIN` 연산).
+
+---
+
+## 6. 마치며
 
 이 프로젝트(MyStaGram)는 웹 개발의 가장 핵심적인 패턴인 **Client-Server Architecture**를 따르고 있습니다.
 이 코드를 수정해보며 학습하려면 다음 순서를 추천합니다:
